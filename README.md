@@ -16,7 +16,8 @@ Installation
 Usage
 ------
 
-(1) Enable dracarys chain
+## Enable Dracarys Chain
+
 ```java
 @EnableDracarysChain
 @SpringBootApplication
@@ -29,7 +30,7 @@ public class Application {
 }
 ```
 
-(2) Create commands
+## Commands
 
 ```java
 import lombok.RequiredArgsConstructor;
@@ -83,7 +84,7 @@ public class EmailSendCmd implements Command {
 
 ```
 
-(3) Create chain
+## Chain
 
 ```java
 
