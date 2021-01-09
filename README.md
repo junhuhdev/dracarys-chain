@@ -1,6 +1,6 @@
 ![](https://github.com/junhuhdev/dracarys-chain/blob/master/logo.png?raw=true)
 
-# dracarys-chain
+# 🔥 dracarys-chain
 
 Installation
 ------------
@@ -113,3 +113,4 @@ TODO
 * Sub-chains
 * Support retries
 * Customizable lock key 
+* Custom annotations
