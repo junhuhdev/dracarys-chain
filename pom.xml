@@ -9,7 +9,7 @@
     </parent>
     <groupId>io.github.junhuhdev</groupId>
     <artifactId>dracarys-chain</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <name>dracarys-chain</name>
     <description>Chain of responsibility abstraction</description>
 
@@ -21,7 +21,7 @@
         <connection>scm:git:git@github.com:junhuhdev/dracarys-chain.git</connection>
         <developerConnection>scm:git:git@github.com:junhuhdev/dracarys-chain.git</developerConnection>
         <url>https://github.com/junhuhdev/dracarys-chain</url>
-        <tag>1.0.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <dependencies>
