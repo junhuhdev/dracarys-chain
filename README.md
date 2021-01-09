@@ -89,21 +89,16 @@ public class EmailSendCmd implements Command {
 ## Chain
 
 ```java
-import huh.enterprises.dracarys.chain.chain.ChainBase;
+import ChainBase;
 import org.springframework.stereotype.Component;
 
 @Component
 public class UserRegistrationChain extends ChainBase {
 
-	@Override
-	protected Class<?>[] getCommands() {
-		return new Class<?>[]{
-				UserValidateCmd.class,
-				UserCreateCmd.class,
-				EmailSendCmd.class
-		};
-	}
-
+    @Override
+    protected Class<?>[] getCommands() {
+        return new Class<?>[]{UserValidateCmd.class, UserCreateCmd.class, EmailSendCmd.class};
+    }
 }
 ```
 

@@ -8,7 +8,7 @@
         <version>2.4.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>huh.enterprises</groupId>
+    <groupId>io.github.junhuhdev</groupId>
     <artifactId>dracarys-chain</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>dracarys-chain</name>
