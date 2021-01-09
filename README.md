@@ -8,7 +8,7 @@ Installation
 ```xml
 
 <dependency>
-    <groupId>huh.enterprises</groupId>
+    <groupId>io.github.junhuhdev</groupId>
     <artifactId>dracarys-chain</artifactId>
     <version>1.0.0</version>
 </dependency>
