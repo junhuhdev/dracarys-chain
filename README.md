@@ -6,6 +6,7 @@ Installation
 ------------
 
 ```xml
+
 <dependency>
     <groupId>huh.enterprises</groupId>
     <artifactId>dracarys-chain</artifactId>
@@ -19,14 +20,15 @@ Usage
 ## Enable Dracarys Chain
 
 ```java
+
 @EnableDracarysChain
 @SpringBootApplication
 public class Application {
-	
+
 	public static void main(String[] args) {
-        SpringApplication.run(JobRunrApplication.class, args);
-    }
-	
+		SpringApplication.run(JobRunrApplication.class, args);
+	}
+
 }
 ```
 
@@ -41,7 +43,7 @@ import org.springframework.stereotype.Component;
 public class UserValidateCmd implements Command {
 
 	private final ValidationService validationService;
-	
+
 	public ChainContext execute(ChainContext ctx, Chain chain) {
 		var event = ctx.getEvent(ValidateUserRequest.class);
 		boolean response = validationService.validate(event);
@@ -58,7 +60,7 @@ public class UserValidateCmd implements Command {
 public class UserCreateCmd implements Command {
 
 	private final UserRepository userRepository;
-	
+
 	public ChainContext execute(ChainContext ctx, Chain chain) {
 		var event = ctx.getEvent(UserRequest.class);
 		userRepository.create(event);
@@ -72,7 +74,7 @@ public class UserCreateCmd implements Command {
 public class EmailSendCmd implements Command {
 
 	private final EmailService emailService;
-	
+
 	public ChainContext execute(ChainContext ctx, Chain chain) {
 		var event = ctx.getEvent(MailRequest.class);
 		emailService.send(event);
@@ -87,22 +89,20 @@ public class EmailSendCmd implements Command {
 ## Chain
 
 ```java
-
 import huh.enterprises.dracarys.chain.chain.ChainBase;
 import org.springframework.stereotype.Component;
 
 @Component
 public class UserRegistrationChain extends ChainBase {
-	
-	@Override
-    protected Class<?>[] getCommands() {
-		return new Class<?>[] {
-				UserValidateCmd.class,
-                UserCreateCmd.class,
-                EmailSendCmd.class
-        };
-    }
-	
-}
 
+	@Override
+	protected Class<?>[] getCommands() {
+		return new Class<?>[]{
+				UserValidateCmd.class,
+				UserCreateCmd.class,
+				EmailSendCmd.class
+		};
+	}
+
+}
 ```
