@@ -2,8 +2,8 @@ package huh.enterprises.dracarys.chain.cmd;
 
 import huh.enterprises.dracarys.chain.chain.Chain;
 import huh.enterprises.dracarys.chain.chain.ChainContext;
-import huh.enterprises.dracarys.chain.event.XEvent;
-import huh.enterprises.dracarys.chain.event.XEventState;
+import huh.enterprises.dracarys.chain.event.Event;
+import huh.enterprises.dracarys.chain.event.EventState;
 import huh.enterprises.dracarys.chain.jdbc.EventJdbcRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
@@ -35,11 +35,11 @@ public class TransactionLockCmd implements Command {
 	}
 
 	@Value
-	private static class LockEvent implements XEvent {
+	private static class LockEvent implements Event {
 
 		@Override
-		public Optional<XEventState> nextState() {
-			return Optional.of(XEventState.PROCESSING);
+		public Optional<EventState> nextState() {
+			return Optional.of(EventState.PROCESSING);
 		}
 
 	}

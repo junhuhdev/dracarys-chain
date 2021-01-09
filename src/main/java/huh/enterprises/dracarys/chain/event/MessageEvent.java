@@ -3,7 +3,7 @@ package huh.enterprises.dracarys.chain.event;
 /**
  * Generic event to wrap any kind of model
  */
-public class MessageEvent<T> implements XEvent {
+public class MessageEvent<T> implements Event {
 
 	private final T event;
 

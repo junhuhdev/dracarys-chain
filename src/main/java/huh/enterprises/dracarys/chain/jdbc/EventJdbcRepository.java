@@ -1,10 +1,10 @@
 package huh.enterprises.dracarys.chain.jdbc;
 
-import huh.enterprises.dracarys.chain.event.XEvent;
-import huh.enterprises.dracarys.chain.event.XEventQuery;
-import huh.enterprises.dracarys.chain.event.XEventSQLQuery;
-import huh.enterprises.dracarys.chain.event.XEventState;
-import huh.enterprises.dracarys.chain.event.XEventTransaction;
+import huh.enterprises.dracarys.chain.event.Event;
+import huh.enterprises.dracarys.chain.event.EventQuery;
+import huh.enterprises.dracarys.chain.event.EventSQLQuery;
+import huh.enterprises.dracarys.chain.event.EventState;
+import huh.enterprises.dracarys.chain.event.EventTransaction;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -29,7 +29,7 @@ import java.util.Optional;
 
 import static java.util.Objects.isNull;
 
-public class EventJdbcRepository extends BaseJdbcRepository<XEventQuery, XEventTransaction> {
+public class EventJdbcRepository extends BaseJdbcRepository<EventQuery, EventTransaction> {
 
 	private final Tx tx;
 
@@ -38,7 +38,7 @@ public class EventJdbcRepository extends BaseJdbcRepository<XEventQuery, XEventT
 		this.tx = new Tx(new TransactionTemplate(txManager));
 	}
 
-	private static SqlParameterSource getParams(XEventTransaction record) {
+	private static SqlParameterSource getParams(EventTransaction record) {
 		String roots = record.toXml();
 		return new MapSqlParameterSource()
 				.addValue("id", record.getId())
@@ -48,13 +48,13 @@ public class EventJdbcRepository extends BaseJdbcRepository<XEventQuery, XEventT
 				.addValue("history", new SqlLobValue(roots, new DefaultLobHandler()), Types.CLOB);
 	}
 
-	public XEventTransaction findById(Long id) {
-		return select(XEventQuery.builder()
+	public EventTransaction findById(Long id) {
+		return select(EventQuery.builder()
 				.id(id)
 				.build());
 	}
 
-	public XEventTransaction findByReferenceId(String referenceId) {
+	public EventTransaction findByReferenceId(String referenceId) {
 		var params = new MapSqlParameterSource()
 				.addValue("referenceId", referenceId);
 		var response = getNamedParameterJdbcTemplate()
@@ -64,35 +64,35 @@ public class EventJdbcRepository extends BaseJdbcRepository<XEventQuery, XEventT
 		return Optional.ofNullable(response).orElseThrow(() -> new IllegalStateException(String.format("Event %s does not exist", referenceId)));
 	}
 
-	public XEventTransaction select(XEventQuery query) {
+	public EventTransaction select(EventQuery query) {
 		return getNamedParameterJdbcTemplate()
 				.query("SELECT * FROM XEVENT_TRANSACTION WHERE id = :id",
 						new BeanPropertySqlParameterSource(query),
 						new RowExtractor());
 	}
 
-	public List<XEventTransaction> query(XEventSQLQuery query) {
+	public List<EventTransaction> query(EventSQLQuery query) {
 		return getNamedParameterJdbcTemplate()
 				.query(query.getSql(),
 						query.getParams(),
 						new ListExtractor());
 	}
 
-	public List<XEventTransaction> selectAllUnprocessedByWorkflow(XEventQuery query) {
+	public List<EventTransaction> selectAllUnprocessedByWorkflow(EventQuery query) {
 		return getNamedParameterJdbcTemplate()
 				.query("SELECT * FROM XEVENT_TRANSACTION WHERE STATE = 'REGISTERED' AND WORKFLOW = :workflow ORDER BY CREATED ASC FETCH FIRST :limit ROWS ONLY ",
 						new BeanPropertySqlParameterSource(query),
 						new ListExtractor());
 	}
 
-	public List<XEventTransaction> selectAllUnprocessed(XEventQuery query) {
+	public List<EventTransaction> selectAllUnprocessed(EventQuery query) {
 		return getNamedParameterJdbcTemplate()
 				.query("SELECT * FROM XEVENT_TRANSACTION WHERE STATE = 'REGISTERED' ORDER BY CREATED ASC FETCH FIRST :limit ROWS ONLY ",
 						new BeanPropertySqlParameterSource(query),
 						new ListExtractor());
 	}
 
-	public boolean batchInsert(List<XEventTransaction> records) {
+	public boolean batchInsert(List<EventTransaction> records) {
 		var params = records.stream()
 				.map(EventJdbcRepository::getParams)
 				.toArray(SqlParameterSource[]::new);
@@ -101,7 +101,7 @@ public class EventJdbcRepository extends BaseJdbcRepository<XEventQuery, XEventT
 		return Arrays.stream(count).count() == records.size();
 	}
 
-	public boolean insert(XEventTransaction record) {
+	public boolean insert(EventTransaction record) {
 		SqlParameterSource params = getParams(record);
 		var count = tx.wrap(() -> getNamedParameterJdbcTemplate()
 				.update("INSERT INTO XEVENT_TRANSACTION (PARENT_ID, STATE, WORKFLOW, HISTORY) VALUES (:parentId, :state, :workflow, :history)",
@@ -109,7 +109,7 @@ public class EventJdbcRepository extends BaseJdbcRepository<XEventQuery, XEventT
 		return count == 1;
 	}
 
-	public boolean update(XEventTransaction record) {
+	public boolean update(EventTransaction record) {
 		SqlParameterSource params = getParams(record);
 		var count = tx.wrap(() -> getNamedParameterJdbcTemplate()
 				.update("UPDATE XEVENT_TRANSACTION SET HISTORY = :history, STATE = :state, WORKFLOW = :workflow WHERE ID = :id",
@@ -117,7 +117,7 @@ public class EventJdbcRepository extends BaseJdbcRepository<XEventQuery, XEventT
 		return count == 1;
 	}
 
-	public boolean lock(XEventTransaction record) {
+	public boolean lock(EventTransaction record) {
 		SqlParameterSource params = getParams(record);
 		var count = tx.wrap(() -> getNamedParameterJdbcTemplate()
 				.update("UPDATE XEVENT_TRANSACTION SET STATE = :state WHERE ID = :id AND STATE <> :state",
@@ -125,11 +125,11 @@ public class EventJdbcRepository extends BaseJdbcRepository<XEventQuery, XEventT
 		return count == 1;
 	}
 
-	private static final class RowExtractor extends BaseExtractor implements ResultSetExtractor<XEventTransaction> {
+	private static final class RowExtractor extends BaseExtractor implements ResultSetExtractor<EventTransaction> {
 
 		@Override
-		public XEventTransaction extractData(ResultSet rs) throws SQLException, DataAccessException {
-			XEventTransaction record = null;
+		public EventTransaction extractData(ResultSet rs) throws SQLException, DataAccessException {
+			EventTransaction record = null;
 			if (!rs.next()) {
 				return null;
 			} else {
@@ -144,11 +144,11 @@ public class EventJdbcRepository extends BaseJdbcRepository<XEventQuery, XEventT
 
 	}
 
-	private static final class ListExtractor extends BaseExtractor implements ResultSetExtractor<List<XEventTransaction>> {
+	private static final class ListExtractor extends BaseExtractor implements ResultSetExtractor<List<EventTransaction>> {
 
 		@Override
-		public List<XEventTransaction> extractData(ResultSet rs) throws SQLException, DataAccessException {
-			Map<Long, XEventTransaction> records = new HashMap<>();
+		public List<EventTransaction> extractData(ResultSet rs) throws SQLException, DataAccessException {
+			Map<Long, EventTransaction> records = new HashMap<>();
 			if (!rs.next()) {
 				return Collections.emptyList();
 			} else {
@@ -168,14 +168,14 @@ public class EventJdbcRepository extends BaseJdbcRepository<XEventQuery, XEventT
 
 	private static class BaseExtractor {
 
-		public XEventTransaction map(ResultSet rs) throws SQLException {
+		public EventTransaction map(ResultSet rs) throws SQLException {
 			String xml = rs.getString("HISTORY");
-			List<XEvent> events = XEventTransaction.fromXml(xml);
-			return XEventTransaction.builder()
+			List<Event> events = EventTransaction.fromXml(xml);
+			return EventTransaction.builder()
 					.id(rs.getLong("ID"))
 					.parentId(rs.getLong("PARENT_ID"))
 					.referenceId(rs.getString("REFERENCE_ID"))
-					.state(XEventState.valueOf(rs.getString("STATE")))
+					.state(EventState.valueOf(rs.getString("STATE")))
 					.workflow(rs.getString("WORKFLOW"))
 					.events(events)
 					.build();

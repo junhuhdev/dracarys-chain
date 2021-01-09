@@ -4,7 +4,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.util.Optional;
 
-public class FaultEvent implements XEvent {
+public class FaultEvent implements Event {
 
 	private static final int MAX_STACK_FRAMES = 10;
 	private final String message;
@@ -46,8 +46,8 @@ public class FaultEvent implements XEvent {
 	}
 
 	@Override
-	public Optional<XEventState> nextState() {
-		return Optional.of(XEventState.FAILED);
+	public Optional<EventState> nextState() {
+		return Optional.of(EventState.FAILED);
 	}
 
 }

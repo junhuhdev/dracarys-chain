@@ -2,14 +2,14 @@ package huh.enterprises.dracarys.chain.event;
 
 import java.util.Optional;
 
-public interface XEvent {
+public interface Event {
 
 	/** Optionally override this method when nextState transition is required */
-	default Optional<XEventState> nextState() {
+	default Optional<EventState> nextState() {
 		return Optional.empty();
 	}
 
-	default void nextUpdate(XEventTransaction xEventTransaction) {
+	default void nextUpdate(EventTransaction xEventTransaction) {
 	}
 
 }

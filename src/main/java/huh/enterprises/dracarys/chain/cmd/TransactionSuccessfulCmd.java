@@ -1,9 +1,9 @@
 package huh.enterprises.dracarys.chain.cmd;
 
-import com.tele2.orderflow.mcls.mclsparent.chain.Chain;
-import com.tele2.orderflow.mcls.mclsparent.chain.ChainContext;
-import com.tele2.orderflow.mcls.mclsparent.event.XEvent;
-import com.tele2.orderflow.mcls.mclsparent.event.XEventState;
+import huh.enterprises.dracarys.chain.chain.Chain;
+import huh.enterprises.dracarys.chain.chain.ChainContext;
+import huh.enterprises.dracarys.chain.event.Event;
+import huh.enterprises.dracarys.chain.event.EventState;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
@@ -18,18 +18,18 @@ public class TransactionSuccessfulCmd implements Command {
 
 	@Override
 	public ChainContext execute(ChainContext ctx, Chain chain) throws Exception {
-		if (ctx.getState().canStateTransitionTo(XEventState.SUCCESSFUL)) {
+		if (ctx.getState().canStateTransitionTo(EventState.SUCCESSFUL)) {
 			ctx.store(new SuccessfulEvent());
 		}
 		return chain.proceed(ctx);
 	}
 
 	@Value
-	private static class SuccessfulEvent implements XEvent {
+	private static class SuccessfulEvent implements Event {
 
 		@Override
-		public Optional<XEventState> nextState() {
-			return Optional.of(XEventState.SUCCESSFUL);
+		public Optional<EventState> nextState() {
+			return Optional.of(EventState.SUCCESSFUL);
 		}
 
 	}

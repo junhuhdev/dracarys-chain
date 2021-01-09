@@ -1,6 +1,6 @@
 package huh.enterprises.dracarys.chain.chain;
 
-import huh.enterprises.dracarys.chain.event.XEventTransaction;
+import huh.enterprises.dracarys.chain.event.EventTransaction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -18,7 +18,7 @@ public class ChainRouter implements Chainable {
 	private final List<ChainBase> chains;
 
 	@Override
-	public ChainContext dispatch(XEventTransaction event) throws Exception {
+	public ChainContext dispatch(EventTransaction event) throws Exception {
 		var chainMatches = chains.stream()
 				.filter(Chainable::isMixable)
 				.filter(chain -> chain.canProcess(event))

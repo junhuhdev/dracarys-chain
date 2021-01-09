@@ -1,11 +1,11 @@
 package huh.enterprises.dracarys.chain.chain;
 
-import huh.enterprises.dracarys.chain.event.XEventTransaction;
+import huh.enterprises.dracarys.chain.event.EventTransaction;
 
 public interface Chainable {
 
 	/** Main entry point to trigger a chain execution */
-	ChainContext dispatch(XEventTransaction event) throws Exception;
+	ChainContext dispatch(EventTransaction event) throws Exception;
 
 	/** Resume processing of callback event */
 	default ChainContext resume(String referenceId) throws Exception {

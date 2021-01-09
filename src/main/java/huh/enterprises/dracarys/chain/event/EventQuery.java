@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-public class XEventQuery {
+public class EventQuery {
 
 	Long id;
 	String workflow;

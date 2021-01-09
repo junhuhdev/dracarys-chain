@@ -16,35 +16,35 @@ import java.util.Objects;
 @NoArgsConstructor
 @Data
 @Builder
-public class XEventTransaction implements XEvent {
+public class EventTransaction implements Event {
 
 	private Long id;
 	private Long parentId;
 	private String referenceId;
 	@Builder.Default
-	private XEventState state = XEventState.REGISTERED;
+	private EventState state = EventState.REGISTERED;
 	private String workflow;
-	private List<XEvent> events = new ArrayList<>();
+	private List<Event> events = new ArrayList<>();
 	@Builder.Default
 	private LocalDateTime created = LocalDateTime.now();
 
-	public static XEventTransaction newTransaction(XEvent event, String workflow) {
-		return XEventTransaction.builder()
+	public static EventTransaction newTransaction(Event event, String workflow) {
+		return EventTransaction.builder()
 				.workflow(workflow)
 				.events(Lists.newArrayList(event))
 				.build();
 	}
 
 	@SuppressWarnings("unchecked")
-	public static List<XEvent> fromXml(String xml) {
-		return (List<XEvent>) XStreamFactory.xstream().fromXML(xml);
+	public static List<Event> fromXml(String xml) {
+		return (List<Event>) XStreamFactory.xstream().fromXML(xml);
 	}
 
 	public boolean isProcessing() {
 		return getState().isProcessing();
 	}
 
-	public void triggerStateTransition(XEventState newState) {
+	public void triggerStateTransition(EventState newState) {
 		if (!state.canStateTransitionTo(newState)) {
 			throw new IllegalStateException("Cannot trigger state transition from " + this.state + " to " + newState);
 		}
@@ -52,8 +52,8 @@ public class XEventTransaction implements XEvent {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends XEvent> T getFirstEvent(Class<T> event) {
-		for (XEvent xEvent : events) {
+	public <T extends Event> T getFirstEvent(Class<T> event) {
+		for (Event xEvent : events) {
 			if (event.isInstance(xEvent)) {
 				return (T) xEvent;
 			}
@@ -62,7 +62,7 @@ public class XEventTransaction implements XEvent {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends XEvent> T getLatestEvent(Class<T> event) {
+	public <T extends Event> T getLatestEvent(Class<T> event) {
 		for (int i = events.size() - 1; i >= 0; i--) {
 			if (event.isInstance(events.get(i))) {
 				return (T) events.get(i);
@@ -72,11 +72,11 @@ public class XEventTransaction implements XEvent {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends XEvent> T getLatestEvent() {
+	public <T extends Event> T getLatestEvent() {
 		return (T) events.get(events.size() - 1);
 	}
 
-	public void store(XEvent event) {
+	public void store(Event event) {
 		if (Objects.nonNull(event)) {
 			this.events.add(event);
 		}

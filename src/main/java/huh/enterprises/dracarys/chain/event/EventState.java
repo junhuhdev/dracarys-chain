@@ -10,7 +10,7 @@ import java.util.Map;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Slf4j
-public enum XEventState {
+public enum EventState {
 	/** REGISTERED state -> waiting to be processed */
 	REGISTERED,
 	/** PROCESSING state -> currently being processed by a thread  */
@@ -19,7 +19,7 @@ public enum XEventState {
 	WAITING_CALLBACK,
 	SUCCESSFUL,
 	FAILED;
-	private final static Map<XEventState, List<XEventState>> stateTransitions = new HashMap<>();
+	private final static Map<EventState, List<EventState>> stateTransitions = new HashMap<>();
 
 	static {
 		stateTransitions.put(REGISTERED, Lists.newArrayList(PROCESSING, FAILED));
@@ -27,7 +27,7 @@ public enum XEventState {
 		stateTransitions.put(WAITING_CALLBACK, Lists.newArrayList(PROCESSING, FAILED));
 	}
 
-	public boolean canStateTransitionTo(XEventState newState) {
+	public boolean canStateTransitionTo(EventState newState) {
 		var possibleNewStates = stateTransitions.get(this);
 		if (isEmpty(possibleNewStates)) {
 			return false;

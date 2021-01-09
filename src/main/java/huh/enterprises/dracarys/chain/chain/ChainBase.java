@@ -7,7 +7,7 @@ import huh.enterprises.dracarys.chain.cmd.TransactionLockCmd;
 import huh.enterprises.dracarys.chain.cmd.TransactionSaveAsLastCmd;
 import huh.enterprises.dracarys.chain.cmd.TransactionSuccessfulCmd;
 import huh.enterprises.dracarys.chain.common.Conditional;
-import huh.enterprises.dracarys.chain.event.XEventTransaction;
+import huh.enterprises.dracarys.chain.event.EventTransaction;
 import huh.enterprises.dracarys.chain.jdbc.EventJdbcRepository;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +56,7 @@ public abstract class ChainBase implements Chainable, Conditional {
 	}
 
 	@Override
-	public ChainContext dispatch(XEventTransaction event) throws Exception {
+	public ChainContext dispatch(EventTransaction event) throws Exception {
 		ListIterator<Command> commands = this.createCommands();
 		Chain chain = new Chain(commands);
 		return chain.proceed(new ChainContext(event));
