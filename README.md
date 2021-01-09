@@ -111,3 +111,5 @@ TODO
 ---------
 * Dashboard 
 * Sub-chains
+* Support retries
+* Customizable lock key 
