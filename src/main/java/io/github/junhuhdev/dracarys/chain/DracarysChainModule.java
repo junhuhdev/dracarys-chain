@@ -6,6 +6,6 @@ import org.springframework.context.annotation.Configuration;
 
 @Slf4j
 @Configuration
-@ComponentScan(basePackages = "huh.enterprises.dracarys.chain")
+@ComponentScan(basePackages = "io.github.junhuhdev.dracarys.chain")
 public class DracarysChainModule {
 }

@@ -1,5 +1,6 @@
 package io.github.junhuhdev.dracarys.chain.chain;
 
+import io.github.junhuhdev.dracarys.chain.event.EventLambda;
 import io.github.junhuhdev.dracarys.chain.event.EventTransaction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,10 @@ public class ChainRouter implements Chainable {
 			ctx = chain.dispatch(event);
 		}
 		return ctx;
+	}
+
+	public void enqueue(EventLambda event) {
+
 	}
 
 }
