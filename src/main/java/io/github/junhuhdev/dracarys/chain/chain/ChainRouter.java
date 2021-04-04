@@ -1,7 +1,5 @@
 package io.github.junhuhdev.dracarys.chain.chain;
 
-import io.github.junhuhdev.dracarys.chain.event.EventLambda;
-import io.github.junhuhdev.dracarys.chain.event.EventTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,10 +32,6 @@ public class ChainRouter implements Chainable {
 		}
 		var chain = chainMatches.stream().findFirst().orElseThrow();
 		return chain.dispatch(cmd);
-	}
-
-	public void enqueue(EventLambda event) {
-
 	}
 
 }
