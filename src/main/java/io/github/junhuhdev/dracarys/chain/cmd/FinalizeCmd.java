@@ -2,6 +2,7 @@ package io.github.junhuhdev.dracarys.chain.cmd;
 
 import io.github.junhuhdev.dracarys.chain.chain.Chain;
 import io.github.junhuhdev.dracarys.chain.chain.ChainContext;
+import io.github.junhuhdev.dracarys.chain.chain.Command;
 import org.springframework.stereotype.Component;
 
 /**

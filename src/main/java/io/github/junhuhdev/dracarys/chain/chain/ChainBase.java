@@ -1,92 +1,54 @@
 package io.github.junhuhdev.dracarys.chain.chain;
 
-import io.github.junhuhdev.dracarys.chain.cmd.Command;
-import io.github.junhuhdev.dracarys.chain.cmd.ExceptionHandlerCmd;
-import io.github.junhuhdev.dracarys.chain.cmd.FinalizeCmd;
-import io.github.junhuhdev.dracarys.chain.cmd.TransactionLockCmd;
-import io.github.junhuhdev.dracarys.chain.cmd.TransactionSaveAsLastCmd;
-import io.github.junhuhdev.dracarys.chain.cmd.TransactionSuccessfulCmd;
-import io.github.junhuhdev.dracarys.chain.common.Conditional;
-import io.github.junhuhdev.dracarys.chain.event.EventTransaction;
-import io.github.junhuhdev.dracarys.chain.jdbc.EventJdbcRepository;
+import jakarta.enterprise.inject.spi.CDI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ListableBeanFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 
 /**
  * One chain per event to process
  */
-public abstract class ChainBase implements Chainable, Conditional {
+public abstract class ChainBase<REQUEST extends Command.Request> implements Chainable {
 
-    @Resource
-    private ListableBeanFactory beanFactory;
-    @Autowired
-    private PreChain preChain;
-    @Autowired
-    private PostChain postChain;
-    @Autowired
-    private EventJdbcRepository eventJdbcRepository;
+	private final Logger log = LoggerFactory.getLogger(ChainBase.class);
 
-    protected abstract Class<?>[] getCommands();
+	@Resource
+	private ListableBeanFactory beanFactory;
 
-    private ListIterator<Command> createCommands() {
-        List<Command> commands = new ArrayList<>();
-        addCommands(commands, preChain.getCommands());
-        addCommands(commands, this.getCommands());
-        addCommands(commands, postChain.getCommands());
-        return commands.listIterator();
-    }
+	protected abstract List<Class<? extends Command>> listOfCommands();
 
-    private void addCommands(List<Command> commands, Class<?>[] listOfCmds) {
-        for (Class<?> clazz : listOfCmds) {
-            Command bean = (Command) beanFactory.getBean(clazz);
-            commands.add(bean);
-        }
-    }
+	@Override
+	public ChainContext dispatch(Command.Request command) throws Exception {
+		ListIterator<Command.Handler> commands = injectCommands();
+		Chain chain = new Chain(commands);
+		return chain.proceed(new ChainContext(command));
+	}
 
-    @Override
-    public ChainContext resume(String referenceId) throws Exception {
-        var event = eventJdbcRepository.findByReferenceId(referenceId);
-        return dispatch(event);
-    }
+	protected boolean matches(REQUEST request) {
+		Class handlerType = getClass();
+		Class commandType = request.getClass();
+		return new FirstGenericArgOf(handlerType).isAssignableFrom(commandType);
+	}
 
-    @Override
-    public ChainContext dispatch(EventTransaction event) throws Exception {
-        ListIterator<Command> commands = this.createCommands();
-        Chain chain = new Chain(commands);
-        return chain.proceed(new ChainContext(event));
-    }
+	private ListIterator<Command.Handler> injectCommands() {
+		List<Command.Handler> commands = new ArrayList<>();
+		for (var cmd : listOfCommands()) {
+			var clazz = Arrays.stream(cmd.getDeclaredClasses())
+					.filter(r -> r.getSimpleName().equalsIgnoreCase("Handler"))
+					.findFirst();
+			clazz.ifPresentOrElse(handlerClazz -> {
+				var bean = (Command.Handler) CDI.current().select(handlerClazz).get();
+				// log.info("--> Registered cmd={}", cmd);
+				commands.add(bean);
+			}, () -> log.error("<-- Failed to register cmd={}", cmd));
+		}
+		return commands.listIterator();
+	}
 
-    @Component
-    static class PreChain extends ChainBase {
-
-        @Override
-        protected Class<?>[] getCommands() {
-            return new Class[]{TransactionLockCmd.class, ExceptionHandlerCmd.class, TransactionSaveAsLastCmd.class,};
-        }
-
-        @Override
-        public boolean isMixable() {
-            return false;
-        }
-    }
-
-    @Component
-    static class PostChain extends ChainBase {
-
-        @Override
-        protected Class<?>[] getCommands() {
-            return new Class[]{TransactionSuccessfulCmd.class, FinalizeCmd.class};
-        }
-
-        @Override
-        public boolean isMixable() {
-            return false;
-        }
-    }
 }
